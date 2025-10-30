@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EsToDoList</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="script.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="flex flex-col bg-gray-100 dark:bg-gray-900 min-h-screen font-sans text-gray-900 dark:text-gray-100 transition-colors duration-200">
+    <!-- Header (largura total, mas conteúdo centralizado) -->
+    <header class="w-full bg-white dark:bg-gray-800 shadow-lg">
+        <div class="max-w-3xl mx-auto px-2 sm:px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <!-- Logo e Nome -->
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-list-check text-blue-500 text-2xl sm:text-3xl"></i>
+                <h1 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-200">EsToDoList</h1>
+            </div>
+            <!-- Barra de Pesquisa -->
+            <div class="w-full sm:w-auto order-first sm:order-none">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        placeholder="Pesquisar tarefas..." 
+                        id="search-tasks"
+                        class="w-full px-3 sm:px-4 py-2 pr-8 sm:pr-10 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 text-sm"
+                    >
+                    <i class="fas fa-search absolute right-2 sm:right-3 top-2.5 text-gray-400 dark:text-gray-500 text-sm"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content (centralizado e com largura aumentada) -->
+    <main class="flex-1 max-w-3xl mx-auto px-2 sm:px-4 py-4 sm:py-8">
+        <!-- Adicionar Tarefa -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 mb-4 sm:mb-6">
+            <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <input 
+                    type="text" 
+                    placeholder="Digite uma nova tarefa..."
+                    id="nova-tarefa" 
+                    class="flex-1 px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 text-sm"
+                >
+                <button 
+                    class="bg-blue-500 text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-blue-600 transition duration-200 font-semibold text-sm sm:text-base"
+                    id="adicionar-tarefa"
+                >
+                    Adicionar
+                </button>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 mb-4 sm:mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-2 justify-center sm:justify-start relative sm:static">
+                <div class="flex flex-wrap gap-2 justify-center sm:justify-start" id="filtros">
+                    <button class="px-3 sm:px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200 text-sm">Todas</button>
+                    <button class="px-3 sm:px-4 py-2 rounded-lg bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-400 dark:hover:bg-gray-500 transition duration-200 text-sm">Pendentes</button>
+                    <button class="px-3 sm:px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600 transition duration-200 text-sm">Concluídas</button>
+                </div>
+
+                <!-- Roda de Porcentagem dinâmica -->
+                <div class="flex items-center justify-center sm:justify-start space-x-2 pt-2 sm:pt-0 sm:ml-auto">
+                    <div class="relative flex-shrink-0">
+                        <svg width="40" height="40" viewBox="0 0 50 50" class="transform -rotate-90 w-10 h-10">
+                            <circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="4" 
+                                    class="text-gray-600 dark:text-gray-600" stroke-dasharray="125.6" stroke-dashoffset="0"></circle>
+                            <!-- círculo que será atualizado pelo JS -->
+                            <circle id="progresso-circle" cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="4" 
+                                    class="text-green-500" stroke-dasharray="125.6" stroke-dashoffset="125.6" stroke-linecap="round"></circle>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span id="porcentagem-text" class="text-xs sm:text-xs font-bold text-green-500">0%</span>
+                        </div>
+                    </div>
+                    <span class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left">Concluídas</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estatísticas (valores dinâmicos; classes mantidas para compatibilidade com o script) -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-2 sm:p-2 mb-4 sm:mb-6">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-center">
+                <div>
+                    <h3 class="text-base sm:text-base font-semibold text-gray-800 dark:text-gray-200">Todas</h3>
+                    <p id="total-count" class="text-base sm:text-xl font-bold text-blue-500">0</p>
+                </div>
+                <div>
+                    <h3 class="text-base sm:text-base font-semibold text-gray-800 dark:text-gray-200">Pendentes</h3>
+                    <p id="pendentes-count" class="text-base sm:text-xl font-bold text-gray-600 dark:text-gray-400">0</p>
+                </div>
+                <div>
+                    <h3 class="text-base sm:text-base font-semibold text-gray-800 dark:text-gray-200">Concluídas</h3>
+                    <p id="concluidas-count" class="text-base sm:text-xl font-bold text-green-500">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Tarefas (vazia, será preenchida pelo JS) -->
+        <div id="lista-tarefas" class="space-y-3 sm:space-y-4" aria-live="polite"></div>
+    </main>
+
+    <!-- Footer (largura total, mas conteúdo centralizado) -->
+    <footer class="w-full bg-white dark:bg-gray-800 shadow-md mt-6 sm:mt-8">
+        <div class="max-w-3xl mx-auto px-2 sm:px-4 py-4 sm:py-6 text-center text-gray-600 dark:text-gray-400 text-sm">
+            <p>&copy; 2025 EsToDoList. Todos os direitos reservados.</p>
+            <p class="mt-1 sm:mt-2">Feito por João Guilherme</p>
+        </div>
+    </footer>
+</body>
+</html>
